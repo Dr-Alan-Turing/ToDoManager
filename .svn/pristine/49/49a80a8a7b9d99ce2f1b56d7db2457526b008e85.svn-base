@@ -1,0 +1,114 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.ucll.r0452425_tasks.domain.model;
+
+import java.io.Serializable;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
+
+/**
+ *
+ * @author Tom
+ */
+@Entity
+public class Task implements Serializable {
+    
+    //instance variables
+    @Id
+    @GeneratedValue
+    private long id;
+    private String description = "";
+    @OneToOne(optional=true)
+    private Category category;
+    @OneToOne(optional=false)
+    private TasksUser owner;
+    private boolean isDone;
+    
+    //constructors
+    public Task(){}
+    public Task(String description, Category category, TasksUser owner, boolean isDone) {
+        this.description = description;
+        this.category = category;
+        this.owner = owner;
+        this.isDone = isDone;
+    }
+    public Task(long id, String description, Category category, TasksUser owner, boolean isDone) {
+        this(description, category, owner, isDone);
+        this.id = id;
+    }
+    
+    
+    //getters
+    public long getId() {
+        return id;
+    }
+    public String getDescription() {
+        return description;
+    }
+    public Category getCategory() {
+        return category;
+    }
+    public TasksUser getOwner() {
+        return owner;
+    }
+    public boolean getIsDone() {
+        return isDone;
+    }
+    
+    //setters
+    public void setId(long id) {
+        this.id = id;
+    }
+    public void setDescription(String description) throws ModelException {
+        if(description==null || description.isEmpty()){
+            throw new ModelException("Description must not be empty");
+        }
+        this.description = description;
+    }
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+    public void setOwner(TasksUser owner) throws ModelException {
+        if(owner==null){
+            throw new ModelException("User must not be empty");
+        }
+        this.owner = owner;
+    }
+    public void setIsDone(boolean isDone) {
+        this.isDone = isDone;
+    }
+    
+    //methods
+    
+    public void markAsDone(){
+        setIsDone(true);
+    }
+    
+    public void unmarkAsDone(){
+        setIsDone(false);
+    }
+    
+    @Override
+    public boolean equals(Object o){
+        return o instanceof Task && ((Task)(o)).getDescription().equals(this.getDescription());
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 67 * hash + (this.description != null ? this.description.hashCode() : 0);
+        return hash;
+    }
+    
+    @Override
+    public String toString(){
+        return getDescription()+": "+(this.getIsDone()?"DONE":"TO DO");
+    }
+    
+    
+}

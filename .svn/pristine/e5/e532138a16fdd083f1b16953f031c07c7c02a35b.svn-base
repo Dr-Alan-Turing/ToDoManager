@@ -1,0 +1,158 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.ucll.r0452425_tasks.domain.db;
+
+import com.ucll.r0452425_tasks.domain.model.Category;
+import com.ucll.r0452425_tasks.domain.model.Task;
+import com.ucll.r0452425_tasks.domain.model.TasksUser;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+/**
+ *
+ * @author Tom
+ */
+public class TasksMemoryDatabase implements TasksDatabase {
+    
+    private long idCounterUsers;
+    private long idCounterTasks;
+    private long idCounterCategories;
+    private Map<Long,TasksUser> users;
+    private Map<Long,Task> tasks;
+    private Map<Long,Category> categories;
+    
+    public TasksMemoryDatabase() {
+        users = new HashMap<Long,TasksUser>();
+        tasks = new HashMap<Long,Task>();
+        categories = new HashMap<Long,Category>();
+        idCounterUsers = 1;
+        idCounterTasks = 1;
+        idCounterCategories = 1;
+        
+        addDummyObjects();
+    }
+    
+    @Override
+    public List<Task> getAllTasks(TasksUser user) {
+        List<Task> userTasks = new ArrayList<Task>();
+        for(Task t : tasks.values()){
+            if(t.getOwner().equals(user)){
+                userTasks.add(t);
+            }
+        }
+        return userTasks;
+    }
+    
+    @Override
+    public List<Task> getTasks(long categoryId) {
+        List<Task> tasks = new ArrayList<Task>();
+        for(Task task : getAllTasks(getCategory(categoryId).getOwner())){
+            if(task.getCategory()!=null && task.getCategory().getId()==categoryId){
+                tasks.add(task);
+            }
+        }
+        return tasks;
+    }
+
+    @Override
+    public Task getTask(long id) {
+        return tasks.get(id);
+    }
+
+    @Override
+    public long addTask(Task task) {
+        task.setId(idCounterTasks);
+        tasks.put(task.getId(),task);
+        return idCounterTasks++;
+    }
+
+    @Override
+    public void removeTask(long id) {
+        tasks.remove(id);
+    }
+    
+    @Override
+    public void modifyTask(Task task) {
+        tasks.put(task.getId(),task);
+    }
+    
+    @Override
+    public void markTaskAsDone(long id) {
+        tasks.get(id).markAsDone();
+    }
+
+    @Override
+    public void unmarkTaskAsDone(long id) {
+        tasks.get(id).unmarkAsDone();
+    }
+
+    @Override
+    public List<Category> getCategories(TasksUser user) {
+        List<Category> userCategories = new ArrayList<Category>();
+        for(Category category : categories.values()){
+            if(category.getOwner().equals(user)){
+                userCategories.add(category);
+            }
+        }
+        return userCategories;
+    }
+
+    @Override
+    public Category getCategory(long id) {
+        return categories.get(id);
+    }
+
+    @Override
+    public long addCategory(Category category) {
+        category.setId(idCounterCategories);
+        categories.put(idCounterCategories, category);
+        return idCounterCategories++;
+    }
+
+    @Override
+    public void removeCategory(long id) {
+        categories.remove(id);
+    }
+    
+    private void addDummyObjects() {
+        TasksUser tom = new TasksUser("t@t.com","t");
+        registerUser(tom);
+        Category category1 = new Category("School assignments",tom);
+        addCategory(category1);
+        Category category2 = new Category("Free time", tom);
+        addCategory(category2);
+        addTask(new Task("GTvWA - Make lab 4", category1, tom, false));
+        addTask(new Task("Read 'A Short History of Nearly Everything'", category2, tom, false));
+        addTask(new Task("VGO - Finish 'Yahtzee!'", category1, tom, false));
+        addTask(new Task("Internetprogrammeren - Make HTML + CSS for 'Tasks'", category1, tom, false));
+        addTask(new Task("Make personal website", category2, tom, true));
+        addTask(new Task("Communicatie 2 - Make + upload CV", category1, tom, true));
+        addTask(new Task("Learn 'Comptine d'un Autre Eté' on guitar", category2, tom, true));
+    }
+
+    @Override
+    public List<TasksUser> getUsers() {
+        return new ArrayList<TasksUser>(users.values());
+    }
+    
+    @Override
+    public TasksUser getUser(long id) {
+        return users.get(id);
+    }
+    
+    @Override
+    public void registerUser(TasksUser user) {
+        user.setId(idCounterUsers);
+        users.put(idCounterUsers,user);
+        idCounterUsers++;
+    }
+    
+    
+}

@@ -1,0 +1,65 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.ucll.r0452425_tasks.ui.controller;
+
+import com.ucll.tasks_domain.model.Task;
+import com.ucll.tasks_domain.service.NotLoggedInException;
+import com.ucll.tasks_domain.service.ServiceException;
+import com.ucll.tasks_domain.service.UnauthorisedActionException;
+import java.util.HashMap;
+import java.util.Map;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.RedirectView;
+
+/**
+ *
+ * @author Tom
+ */
+public abstract class CreateOrModifyTaskController extends TasksController {
+    
+    public ModelAndView showCreateOrModifyTask(String operation, Task task, long userId) throws ServiceException{
+        try {
+            ModelAndView mav = new ModelAndView(operation,"task",task);
+            if(operation.equals("modifyTask")){
+                mav.addObject("category", task.getCategory()==null?0:task.getCategory().getId());
+            }
+            mav.addObject("categories",service.getCategories(service.getUserById(userId)));
+            return mav;
+        } catch (NotLoggedInException e) {
+            return new ModelAndView("redirect:/login.htm");
+        }
+    }
+    
+    public ModelAndView processCreateOrModifyTask(String operation, Task task, long userId) throws ServiceException {
+        try {
+            Map<String, String> errorMessages = new HashMap<String, String>();
+            try {
+                if(operation.equals("createTask")){
+                    service.addTask(service.getUserById(userId), task);
+                }
+                else { //operation==modifyTask
+                    service.modifyTask(service.getUserById(userId), task);
+                }
+            } catch(ServiceException e){
+                errorMessages.put("description",e.getMessage());
+            }
+            if(!errorMessages.isEmpty()){
+                ModelAndView mav = new ModelAndView(operation,"task",task);
+                mav.addObject("categories", service.getCategories(service.getUserById(userId)));
+                mav.addObject("errorMessages", errorMessages);
+                return mav;
+            }
+            else {
+                return new ModelAndView(new RedirectView("overviewTasks.htm?category="+(task.getCategory()==null?0:task.getCategory().getId()), false, true, false));
+            }
+        } catch(NotLoggedInException e){
+            return new ModelAndView("redirect:/login.htm");
+        } catch(UnauthorisedActionException e){
+            return new ModelAndView("redirect:/overviewTasks.htm?category="+(task.getCategory()==null?0:task.getCategory().getId()));
+        }
+    }
+    
+}

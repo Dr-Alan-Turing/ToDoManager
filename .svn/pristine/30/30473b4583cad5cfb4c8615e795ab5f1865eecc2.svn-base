@@ -1,0 +1,377 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: trebuchet ms, sans-serif;
+}
+html, body {
+    height: 100%;
+}
+h1 {
+    font-size: 120%;
+}
+h2 {
+    font-size: 180%;
+}
+p {
+    font-size: 100%;
+}
+a {
+    text-decoration: none;
+    color: black;
+}
+ul {
+    list-style: none;
+}
+.red {
+    color: red;
+}
+.clear {
+    clear: both;
+}
+.error {
+    margin-top: 10px !important;
+    font-size: 20px !important;
+}
+button {
+    cursor: pointer;
+}
+
+/*
+*
+Header
+*
+*/
+body {
+    display: table;
+    width: 100%;
+}
+.header {
+    display: table-row;
+    width: 100%;
+    height: 3em;
+    background-color: #343434;
+    text-align: center;
+    color: white;
+}
+.header h1 {
+    padding-top: 3px;
+}
+.header>p>a {
+    color: white;
+    text-decoration: underline;
+}
+#errorHeader, #successHeader {
+    display: table-row;
+    width: 100%;
+    height: 2em;
+    padding-top: 6px;
+    background-color: #d30000;
+    text-align: center;
+    font-size: 13px;
+    color: white;
+}
+#successHeader {
+    background-color: green;
+}
+#errorHeader p, #successHeader p {
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
+/*
+*
+Content
+*
+*/
+.content {
+    display: table-row;
+    width: 100%;
+    height: 100%;
+    //background: url(files/images/contentBackground2.jpg) left top;
+    background: url(../images/contentBackground2.jpg) left top;
+    color: white;
+}
+
+/*
+Categories
+*/
+#categoriesSection {
+    position: relative;
+    float: left;
+    width: 15%;
+    height: 100%;
+    background-color: white;
+    color: black;
+}
+@media(max-height:650px){
+    #categoriesSection {
+        height: 550px;
+    }
+}
+#categoriesSection h2 {
+    margin-bottom: 7px;
+    padding: 12px;
+    font-size: 25px;
+    text-align: center;
+    border-bottom: solid #343434 1px;
+}
+#categoriesSection table {
+    width: 100%;
+    border-collapse: collapse;
+}
+#categoriesSection table tr {
+    height: 40px;
+}
+#categoriesSection table td:nth-child(1) {
+    width: 35px;
+    padding-left: 15px;
+    padding-top: 5px;
+}
+.categoryIcon {
+    height: 20px;
+    opacity: 0.9;
+}
+
+#categoriesSection table #currentCategory a {
+    color: white;
+}
+#categoriesSection table #currentCategory td {
+    background-color: #009AE4;
+}
+
+#categorySettings {
+    position: absolute;
+    bottom: 0;
+}
+
+#addCategoryField {
+    width: 80%;
+}
+
+/*
+Tasks
+*/
+#tasksSection {
+    float: right;
+    width: 85%;
+    height: 100%;
+    color: white;
+}
+
+#createNewTask {
+    clear: both;
+    display: block;
+    width: 95%;
+    height: 40px;
+    margin: 0 auto;
+    margin-top: 30px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 5px;
+}
+#createNewTask>p {
+    margin-left: 15px;
+    padding-top: 10px;
+    color: #ffffff;
+}
+
+#tasksSection h2 {
+    width: 95%;
+    margin: 0 auto;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+#tasksSection table {
+    width: 95%;
+    margin: 0 auto;
+    border-spacing: 0 2px;
+}
+#tasksSection table td {
+    margin-bottom: 10px;
+    padding: 8px;
+    padding-left: 10px;
+    background-color: white;
+    color: black;
+}
+#tasksSection table td:nth-child(1) {
+    width: 25px;
+    padding: 3px;
+    padding-top: 8px;
+    padding-left: 13px;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-right: solid 1px #b4b4b4;
+}
+#tasksSection table td:nth-child(1) input {
+    width: 70%;
+    height: 70%;
+}
+#tasksSection table td:nth-child(3){
+    width: 31px;
+    padding: 0;
+    padding-left: 10px;
+    padding-top: 3px;
+    border-left: solid 1px #b4b4b4;
+}
+#tasksSection table td:nth-child(4){
+    width: 31px;
+    padding: 0;
+    padding-left: 10px;
+    padding-top: 3px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-left: solid 1px #b4b4b4;
+}
+.editIcon, .deleteIcon {
+    height: 19px;
+}
+
+
+@media(max-width:1300px){
+    #categoriesSection {
+        min-width: 22%;
+    }
+    #tasksSection {
+        max-width: 78%;
+    }
+}
+@media(max-width:900px){
+    #categoriesSection {
+        min-width: 30%;
+    }
+    #tasksSection {
+        max-width: 70%;
+    }
+}
+
+
+/*
+*
+Footer
+*
+*/
+.footer {
+    display: table-row;
+    width: 100%;
+    height: 2em;
+    text-align: center;
+    background-color: #343434;
+    color: white;
+}
+.footer>p {
+    padding-top: 7px;
+}
+
+
+/*
+*
+*
+*
+Specific pages and/or items
+*
+*
+*
+*/
+#backToTasks, #logOut {
+    float: left;
+    margin-bottom: 30px;
+    padding-top: 5px;
+    padding-left: 12px;
+    padding-right: 13px;
+    padding-bottom: 7px;
+    border-bottom-right-radius: 5px;
+    background-color: #009AE4;
+}
+#backToTasks img, #logOut img {
+    float: left;
+    height: 30px;
+}
+#backToTasks a, #logOut a {
+    float: right;
+    margin-top: 6px;
+    margin-left: 12px;
+    color: white;
+}
+#logOut {
+    float: right;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 5px;
+}
+#logOut a {
+    margin-left: 12px;
+}
+
+#createOrModifyTask, #login {
+    width: 800px;
+    height: 30%;
+    margin: 0 auto;
+}
+#createOrModifyTask h2, #login h2 {
+    margin-top: 50px;
+    margin-bottom: 60px;
+    text-align: center;
+    font-size: 350%;
+    font-weight: normal;
+}
+
+#createOrModifyTask {
+    clear: both;
+}
+#login h2 {
+    margin-top: 0;
+    padding-top: 80px;
+}
+@media(max-width:900px){
+    #createOrModifyTask, #login {
+        width: 90%;
+    }
+    #createOrModifyTask h2, #login h2 {
+        font-size: 10vw;
+    }
+}
+#createOrModifyTask form p, #login form p {
+    position: relative;
+    margin-top: 5%;
+    font-size: 25px;
+}
+#createOrModifyTask form input, #login form input {
+    margin-top: 10px;
+    width: 97.5%;
+    height: 35px;
+    padding: 5px;
+    padding-left: 10px;
+    border: 0;
+    border-radius: 5px;
+    font-size: 20px;
+}
+#login a {
+    color: #009AE4;
+    text-decoration: underline;
+}
+#register {
+    margin-top: 20px !important;
+}
+#createOrModifyTask form select {
+    margin-top: 10px;
+    width: 100%;
+    height: 45px;
+    padding-left: 6px;
+    border: 0;
+    border-radius: 5px;
+    font-size: 20px;
+}
+#createOrModifyTask form input[type="checkbox"]{
+    position: absolute;
+    top: 6px;
+    margin-top: 0;
+    margin-left: 15px;
+    width: 18px;
+    height: 18px;
+}
+#createOrModifyTask form input[type="submit"], #login form input[type="submit"] {
+    margin-top: 40px;
+    width: 100%;
+    height: 60px;
+    background-color: #009AE4;
+    color: white;
+    font-size: 25px;
+}

@@ -1,0 +1,34 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.ucll.r0452425_tasks.domain.db;
+
+/**
+ *
+ * @author Tom
+ */
+public class DbFactory {
+    
+    public TasksDatabase createDb(String type) throws DbException {
+        if(type.equals("memory")){
+            return new TasksMemoryDatabase();
+        }
+        else if(type.equals("relational_JPA")){
+            return new TasksRelationalDatabase_JPA();
+        }
+        throw new DbException("No database type selected!");
+    }
+    
+    public TasksDatabase switchDatabase(String type) throws DbException {
+        if(type.equals("memory")){
+            return new TasksMemoryDatabase();
+        }
+        else if(type.equals("relational_JPA")){
+            return new TasksRelationalDatabase_JPA();
+        }
+        return null;
+    }
+
+}

@@ -1,0 +1,76 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.ucll.r0452425_tasks.domain.model;
+
+import java.io.Serializable;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
+
+/**
+ *
+ * @author Tom
+ */
+@Entity
+public class Category implements Serializable {
+    
+    @Id
+    @GeneratedValue
+    private long id;
+    private String name = "";
+    @OneToOne
+    private TasksUser owner;
+    
+    public Category(){}
+    public Category(String name, TasksUser owner){
+        this.name = name;
+        this.owner = owner;
+    }
+    public Category(long id, String name, TasksUser owner){
+        this(name, owner);
+        this.id = id;
+    }
+
+    public long getId() {
+        return id;
+    }
+    public String getName() {
+        return name;
+    }
+    public TasksUser getOwner() {
+        return owner;
+    }
+    
+    public void setId(long id) {
+        this.id = id;
+    }
+    public void setName(String name) throws ModelException {
+        if(name==null || name.isEmpty()){
+            throw new ModelException("Category name must not be empty");
+        }
+        this.name = name;
+    }
+    public void setOwner(TasksUser owner) throws ModelException {
+        if(owner==null){
+            throw new ModelException("User must not be empty");
+        }
+        this.owner = owner;
+    }
+    
+    @Override
+    public boolean equals(Object o){
+        return o instanceof Category && ((Category)(o)).getName().equals(this.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 97 * hash + (this.name != null ? this.name.hashCode() : 0);
+        return hash;
+    }
+    
+}

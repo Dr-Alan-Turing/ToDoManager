@@ -1,0 +1,176 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package Integration;
+
+import java.util.List;
+import java.util.UUID;
+import org.junit.After;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import org.junit.Before;
+import org.junit.Test;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+
+/**
+ *
+ * @author Tom
+ */
+public class Test_IntegrationTestFacade {
+    
+    private final WebDriver driver;
+    private final String url;
+    private String validName, validDescription;
+    
+    public Test_IntegrationTestFacade() {
+//        System.setProperty("webdriver.chrome.driver", "C:\\Program Files (x86)\\Google\\chromedriver.exe");
+//        driver = new ChromeDriver();
+        driver = new HtmlUnitDriver(true);
+        url = "http://java.cyclone2.khleuven.be:38034/r0452425_Tasks";
+        
+        registerTestUser();
+        loginTestUser();
+        
+        validName = "testCategory"+UUID.randomUUID().toString();
+        validDescription = "testTask"+UUID.randomUUID().toString();
+    }
+    
+    private void registerTestUser(){
+        driver.get(url+"/register.htm");
+        sendAndSubmitInputToLoginOrRegisterForm("test@test.com", "password");
+    }
+    private void loginTestUser(){
+        driver.get(url+"/login.htm");
+        sendAndSubmitInputToLoginOrRegisterForm("test@test.com", "password");
+    }
+    private void logoutTestUser(){
+        driver.get(url+"/overviewTasks.htm");
+        driver.findElement(By.id("logOut")).findElement(By.tagName("a")).click();
+    }
+    
+    @Before
+    public void setUp() {
+        loginTestUser();
+        driver.get(url+"/overviewTasks.htm");
+    }
+    
+    @After
+    public void tearDown() {
+        logoutTestUser();
+        driver.close();
+    }
+    
+    /*
+    Useful methods for several tests
+    */
+    
+    private void sendAndSubmitInputToLoginOrRegisterForm(String input1, String input2){
+        List<WebElement> inputs = driver.findElements(By.tagName("input"));
+        inputs.get(0).clear();
+        inputs.get(0).sendKeys(input1);
+        inputs.get(1).clear();
+        inputs.get(1).sendKeys(input2);
+        inputs.get(2).click();
+    }
+    private void sendAndSubmitInputToTasksForm(String input){
+        List<WebElement> inputs = driver.findElement(By.id("createOrModifyTask")).findElements(By.tagName("input"));
+        inputs.get(0).clear();
+        inputs.get(0).sendKeys(input);
+        inputs.get(3).click();
+    }
+    
+    /*
+    Test methods
+    */
+    
+    private void createCategory(String name) {
+        /*WebElement addButton = driver.findElement(By.id("newCategory")).findElements(By.tagName("a")).get(0);
+        addButton.click();
+        WebDriverWait wait = new WebDriverWait(driver, 5);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("addCategoryField")));
+        WebElement addField = driver.findElement(By.id("addCategoryField"));
+        addField.clear();
+        addField.sendKeys(name);
+        addButton.click();*/
+        //Bovenstaande werkt met chrome/firefox drivers maar niet met htmlunit door javascript (ook al is die enabled). Daarom:
+        driver.get(url+"/processCreateCategory.htm?name="+name);
+    }
+    private boolean doesCategoryExist(String name) {
+        boolean exists = false;
+        for(WebElement category : driver.findElement(By.id("categoriesTable")).findElements(By.tagName("a"))){
+            if(category.getText().equals(name)){
+                exists = true;
+                break;
+            }
+        }
+        return exists;
+    }
+    private boolean doesTaskExist(String description){
+        boolean exists = false;
+        for(WebElement taskTr : driver.findElement(By.id("tasksSection")).findElements(By.tagName("tr"))){
+            if(taskTr.findElements(By.tagName("td")).get(1).getText().equals(description)){
+                exists = true;
+                break;
+            }
+        }
+        return exists;
+    }
+    
+    @Test
+    public void createCategory_usingValidName_showsCategoryInList() {
+        createCategory(validName);
+        assertEquals("My tasks",driver.getTitle());
+        assertTrue(doesCategoryExist(validName));
+    }
+    @Test
+    public void deleteCategory_usingValidCategory_removesCategoryFromList() {
+        String categoryName = UUID.randomUUID().toString();
+        createCategory(categoryName);
+        assertTrue(doesCategoryExist(categoryName));
+        WebElement deleteButton = driver.findElement(By.id("deleteCategory")).findElements(By.tagName("a")).get(0);
+        deleteButton.click();
+//        WebDriverWait wait = new WebDriverWait(driver,1);
+//        wait.until(ExpectedConditions.alertIsPresent());
+//        driver.switchTo().alert().accept();
+        assertEquals("My tasks",driver.getTitle());
+        assertFalse(doesCategoryExist(categoryName));
+    }
+    @Test
+    public void deleteCategory_usingAllCategory_showsErrorMessage(){
+        WebElement deleteButton = driver.findElement(By.id("deleteCategory")).findElements(By.tagName("a")).get(0);
+        deleteButton.click();
+        assertEquals("My tasks",driver.getTitle());
+        assertFalse(driver.findElements(By.id("errorHeader")).isEmpty());
+    }
+    @Test
+    public void createTask_usingValidArguments_showsTaskInList() {
+        driver.findElement(By.id("createNewTask")).click();
+        assertEquals("Create new task",driver.getTitle());
+        sendAndSubmitInputToTasksForm(validDescription);
+        assertEquals("My tasks",driver.getTitle());
+        assertTrue(doesTaskExist(validDescription));
+    }
+    @Test
+    public void deleteTask_removesTaskFromList(){
+        String taskDescription = UUID.randomUUID().toString();
+        driver.findElement(By.id("createNewTask")).click();
+        sendAndSubmitInputToTasksForm(taskDescription);
+        assertTrue(doesTaskExist(taskDescription));
+        
+        for(WebElement taskTr : driver.findElement(By.id("tasksSection")).findElements(By.tagName("tr"))){
+            if(taskTr.findElements(By.tagName("td")).get(1).getText().equals(taskDescription)){
+                taskTr.findElements(By.tagName("td")).get(3).findElement(By.tagName("a")).click();
+                break;
+            }
+        }
+        assertFalse(doesTaskExist(taskDescription));
+    }
+    
+    
+}

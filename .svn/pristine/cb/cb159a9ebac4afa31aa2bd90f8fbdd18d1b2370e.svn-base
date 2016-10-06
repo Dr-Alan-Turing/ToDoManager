@@ -1,0 +1,267 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.ucll.r0452425_tasks.domain.service;
+
+import com.ucll.r0452425_tasks.domain.db.DbException;
+import com.ucll.r0452425_tasks.domain.db.DbFactory;
+import com.ucll.r0452425_tasks.domain.db.TasksDatabase;
+import com.ucll.r0452425_tasks.domain.model.Category;
+import com.ucll.r0452425_tasks.domain.model.Task;
+import com.ucll.r0452425_tasks.domain.model.TasksUser;
+import java.util.List;
+
+/**
+ *
+ * @author Tom
+ */
+public class TasksService {
+    
+    private TasksDatabase db;
+    
+    //constructor
+    public TasksService(String databaseType) throws ServiceException {
+        DbFactory factory = new DbFactory();
+        try {
+            this.db = factory.createDb(databaseType);
+        } catch (DbException e) {
+            throw new ServiceException("Database failed to create: "+e.getMessage());
+        }
+    }
+    
+    
+    //methods to switch database
+    public void switchDatabase(String type) throws ServiceException {
+        DbFactory factory = new DbFactory();
+        try {
+            this.db = factory.switchDatabase(type);
+        } catch (DbException e) {
+            throw new ServiceException("Database failed to switch: "+e.getMessage());
+        }
+    }
+    
+    //main methods
+    
+    public List<TasksUser> getUsers() throws ServiceException {
+        try {
+            return this.db.getUsers();
+        } catch(DbException e){
+            throw new ServiceException(e.getMessage());
+        }
+    }
+    public TasksUser getUserById(long id) {
+        try {
+            return this.db.getUser(id);
+        } catch(DbException e){
+            return null;
+        }
+    }
+    
+    public TasksUser getAuthenticatedUser(String email, String password) throws ServiceException {
+        TasksUser authenticatedUser = null;
+        for(TasksUser user : getUsers()){
+            if(user.getEmail().equals(email) && user.getPassword().equals(password)){
+                authenticatedUser = user;
+            }
+        }
+        return authenticatedUser;
+    }
+    
+    public void registerUser(TasksUser user) throws ServiceException {
+        if(user==null){
+            throw new ServiceException("User is invalid");
+        }
+        if(getUsers().contains(user)){
+            throw new ServiceException("Email address is already registered");
+        }
+        try {
+            this.db.registerUser(user);
+        } catch(DbException e){
+            throw new ServiceException(e.getMessage());
+        }
+    }
+    
+    public List<Task> getAllTasks(TasksUser user) throws ServiceException, NotLoggedInException {
+        validateUser(user);
+        try {
+            return this.db.getAllTasks(user);
+        } catch(DbException e){
+            throw new ServiceException(e.getMessage());
+        }
+    }
+    
+    public List<Task> getTasks(TasksUser user, long categoryId) throws ServiceException, NotLoggedInException, UnauthorisedActionException {
+        validateCategoryAction(user, categoryId);
+        try {
+            if(this.db.getCategory(categoryId)==null){
+                return this.getAllTasks(user);
+            }
+            return this.db.getTasks(categoryId);
+        } catch(DbException e){
+            throw new ServiceException(e.getMessage());
+        }
+    }
+    
+    public Task getTask(TasksUser user, long id) throws ServiceException, NotLoggedInException, UnauthorisedActionException {
+        validateTaskAction(user, id);
+        try {
+            return this.db.getTask(id);
+        } catch(DbException e){
+            return null;
+        }
+    }
+    
+    public Task getTaskById(long id){
+        try {
+            return this.db.getTask(id);
+        } catch(DbException e){
+            return null;
+        }
+    }
+    
+    public void addTask(TasksUser user, Task task) throws ServiceException, NotLoggedInException {
+        validateUser(user);
+        if(task==null){
+            throw new ServiceException("Task is invalid");
+        }
+        if(this.getAllTasks(user).contains(task)){
+            throw new ServiceException("Task with same description already exists");
+        }
+        try {
+            this.db.addTask(task);
+        } catch (DbException e) {
+            throw new ServiceException(e.getMessage());
+        }
+    }
+    
+    public void removeTask(TasksUser user, long id) throws ServiceException, NotLoggedInException, UnauthorisedActionException {
+        validateTaskAction(user, id);
+        try {
+            this.db.removeTask(id);
+        } catch(DbException e){
+            throw new ServiceException(e.getMessage());
+        }
+    }
+    
+    public void markTaskAsDone(TasksUser user, long id) throws ServiceException, NotLoggedInException, UnauthorisedActionException {
+        validateTaskAction(user, id);
+        try {
+            this.db.markTaskAsDone(id);
+        } catch(DbException e){
+            throw new ServiceException(e.getMessage());
+        }
+    }
+    
+    public void unmarkTaskAsDone(TasksUser user, long id) throws ServiceException, NotLoggedInException, UnauthorisedActionException {
+        validateTaskAction(user, id);
+        try {
+            this.db.unmarkTaskAsDone(id);
+        } catch(DbException e){
+            throw new ServiceException(e.getMessage());
+        }
+    }
+    
+    public void modifyTask(TasksUser user, Task task) throws ServiceException, NotLoggedInException, UnauthorisedActionException {
+        validateTaskAction(user, task.getId());
+        for(Task t : this.getAllTasks(user)){
+            if(t.getId()!=task.getId() && t.equals(task)){
+                throw new ServiceException("Other task with same description already exists");
+            }
+        }
+        try {
+            this.db.modifyTask(task);
+        } catch(DbException e){
+            throw new ServiceException(e.getMessage());
+        }
+    }
+
+    public List<Category> getCategories(TasksUser user) throws ServiceException, NotLoggedInException {
+        validateUser(user);
+        try {
+            return this.db.getCategories(user);
+        } catch(DbException e){
+            throw new ServiceException(e.getMessage());
+        }
+    }
+    
+    public Category getCategory(TasksUser user, long id) {
+        try {
+            return this.db.getCategory(id);
+        } catch(DbException e){
+            return null;
+        }
+    }
+    
+    public Category getCategoryById(long id) {
+        try {
+            return this.db.getCategory(id);
+        } catch(DbException e){
+            return null;
+        }
+    }
+    
+    public long addCategory(TasksUser user, Category category) throws ServiceException, NotLoggedInException {
+        validateUser(user);
+        if(category==null){
+            throw new ServiceException("Category is invalid");
+        }
+        if(this.getCategories(category.getOwner()).contains(category)){
+            throw new ServiceException("Category with same name already exists");
+        }
+        try {
+            return this.db.addCategory(category);
+        } catch(DbException e){
+            throw new ServiceException(e.getMessage());
+        }
+    }
+    public void removeCategory(TasksUser user, long id) throws ServiceException, NotLoggedInException, UnauthorisedActionException {
+        validateCategoryAction(user, id);
+        try {
+            for(Task task : getAllTasks(user)){
+                if(task.getCategory()!=null && task.getCategory().getId()==id){
+                    this.db.removeTask(task.getId());
+                }
+            }
+            this.db.removeCategory(id);
+        } catch(DbException e){
+            throw new ServiceException(e.getMessage());
+        }
+    }
+    
+    public void validateUser(TasksUser user) throws NotLoggedInException {
+        if(user==null){
+            throw new NotLoggedInException();
+        }
+    }
+    
+    public void validateTaskAction(TasksUser user, long taskId) throws NotLoggedInException, UnauthorisedActionException, ServiceException {
+        validateUser(user);
+        boolean authorised = false;
+        for(Task task : getAllTasks(user)){
+            if(task.getId()==taskId){
+                authorised = true;
+                break;
+            }
+        }
+        if(!authorised){
+            throw new UnauthorisedActionException();
+        }
+    }
+    
+    public void validateCategoryAction(TasksUser user, long categoryId) throws NotLoggedInException, UnauthorisedActionException, ServiceException {
+        validateUser(user);
+        boolean authorised = false;
+        for(Category category : getCategories(user)){
+            if(category.getId()==categoryId){
+                authorised = true;
+                break;
+            }
+        }
+        if(!authorised){
+            throw new UnauthorisedActionException();
+        }
+    }    
+    
+}

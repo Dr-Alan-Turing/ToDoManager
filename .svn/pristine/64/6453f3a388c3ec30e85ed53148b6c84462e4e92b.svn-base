@@ -1,0 +1,118 @@
+<%@page import="com.ucll.tasks_domain.model.Task" %>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><spring:message code="tasksOverview.title"/></title>
+    <link rel="stylesheet" type="text/css" href="<c:url value="/resources/css/style.css" />">
+    <script type="text/javascript">
+        //can't go in behaviour.js because it relies on $ { }
+        function setCurrentCategoryIfNoneSelected() {
+            if (${empty currentCategoryId}){
+                var tr = document.getElementById("categoriesTable").getElementsByTagName("tr")[0];
+                tr.setAttribute("id", "currentCategory");
+            }
+        }
+    </script>
+</head>
+<body>
+    <%@include file="/WEB-INF/jspf/header.jspf"%>
+    
+    <c:if test="${!empty errorMessage['invalidCategory']}">
+        <article id="errorHeader">
+            <h1><p><spring:message code="tasksOverview.invalidNewCategory"/></p></h1>
+        </article>
+    </c:if>
+    <c:if test="${!empty errorMessage['categoryExists']}">
+        <article id="errorHeader">
+            <h1><p><spring:message code="tasksOverview.categoryExists"/></p></h1>
+        </article>
+    </c:if>
+    <c:if test="${!empty errorMessage['deletingAll']}">
+        <article id="errorHeader">
+            <h1><p><spring:message code="tasksOverview.deletingAll"/></p></h1>
+        </article>
+    </c:if>
+    
+    <article class="content">
+        <div class="clear"></div>
+        <section id="categoriesSection">
+            <h2><spring:message code="tasksOverview.categories"/></h2>
+            <table id="categoriesTable">
+                <tr <c:if test="${currentCategoryId==0}">id="currentCategory"</c:if>>
+                    <td><img class="categoryIcon" src="<c:url value="/resources/images/allCategoriesIcon.png" />" alt="categoryIcon"></td>
+                    <td><a href="overviewTasks.htm?category=0"><spring:message code="tasksOverview.categoriesAll"/></a></td>
+                </tr>
+                <c:forEach var="category" items="${categories}">
+                    <tr <c:if test="${category.id==currentCategoryId}">id="currentCategory"</c:if>>
+                        <td><img class="categoryIcon" src="<c:url value="/resources/images/categoryIcon.png" />" alt="categoryIcon"></td>
+                        <td><a href="overviewTasks.htm?category=${category.id}">${category.name}</a></td>
+                    </tr>  
+                </c:forEach>
+            </table>
+            <table id="categorySettings">
+                <tr id="deleteCategory">
+                    <td><a href="removeCategory.htm?id=<c:choose><c:when test="${!empty currentCategoryId}">${currentCategoryId}</c:when><c:when test="${!empty param.category}">${param.category}</c:when><c:otherwise>0</c:otherwise></c:choose>" onclick="return confirm('<spring:message code="tasksOverview.confirmDeleteCategory"/>')"><img class="categoryIcon" src="<c:url value="/resources/images/deleteIcon.png" />" alt="deleteCategoryIcon"></a></td>
+                    <td><a href="removeCategory.htm?id=<c:choose><c:when test="${!empty currentCategoryId}">${currentCategoryId}</c:when><c:when test="${!empty param.category}">${param.category}</c:when><c:otherwise>0</c:otherwise></c:choose>" onclick="return confirm('<spring:message code="tasksOverview.confirmDeleteCategory"/>')"><spring:message code="tasksOverview.categoriesDelete"/></a></td>
+                </tr>
+                <tr id="newCategory">
+                    <td><a href="javascript:void(0);" onclick="showAddCategoryField(this)"><img class="categoryIcon" src="<c:url value="/resources/images/newCategoryIcon.png" />" alt="newCategoryIcon"></a></td>
+                    <td><a href="javascript:void(0);" onclick="showAddCategoryField(this)"><spring:message code="tasksOverview.categoriesAdd"/></a></td>
+                </tr>
+            </table>
+        </section>
+                    
+        
+        <section id="tasksSection">
+            <div id="logOut">
+                <div class="clear"></div>
+                <img src="<c:url value="/resources/images/backIcon.png" />" alt="backIcon">
+                <a href="logout.htm"><spring:message code="tasksOverview.logout"/></a>
+                <div class="clear"></div>
+            </div>
+            <a id="createNewTask" href="createTask.htm?category=${currentCategoryId}"><p><spring:message code="tasksOverview.tasksCreateNew"/></p></a>
+            <section id="toDoSection">
+                <h2><spring:message code="tasksOverview.toDo"/></h2>
+                <table>
+                    <c:forEach var="task" items="${tasks}">
+                        <c:if test="${task.isDone==false}">
+                            <tr>
+                            <td><input type="checkbox" onclick="window.location='markTaskAsDone.htm?id=${task.id}'"></td>
+                            <td>${task.description}</td>
+                            <td><a href="modifyTask.htm?id=${task.id}"><img class="editIcon" src="<c:url value="/resources/images/editIcon.png" />" alt="edit"></a></td>
+                            <td><a href="removeTask.htm?id=${task.id}"><img class="deleteIcon" src="<c:url value="/resources/images/deleteIcon.png" />" alt="delete"></a></td>
+                        </tr>
+                        </c:if>  
+                    </c:forEach>
+                </table>
+            </section>
+            <section id="doneSection">
+                <h2><spring:message code="tasksOverview.done"/></h2>
+                <table>
+                    <c:forEach var="task" items="${tasks}">
+                        <c:if test="${task.isDone==true}">
+                            <tr>
+                            <td><input type="checkbox" onclick="window.location='unmarkTaskAsDone.htm?id=${task.id}'" checked></td>
+                            <td>${task.description}</td>
+                            <td><a href="modifyTask.htm?id=${task.id}"><img class="editIcon" src="<c:url value="/resources/images/editIcon.png" />" alt="edit"></a></td>
+                            <td><a href="removeTask.htm?id=${task.id}"><img class="deleteIcon" src="<c:url value="/resources/images/deleteIcon.png" />" alt="delete"></a></td>
+                        </tr>
+                        </c:if>  
+                    </c:forEach>
+                </table>
+            </section>
+        </section>
+        <div class="clear"></div>
+    </article>
+    
+    <jsp:include page="/WEB-INF/jspf/footer.jspf"/>
+    
+    <script type="text/javascript">
+        //functions to be executed on page load
+        setCurrentCategoryIfNoneSelected();
+        window.setTimeout("hideErrorMessage()", 3000);
+    </script>
+</body>
+</html>

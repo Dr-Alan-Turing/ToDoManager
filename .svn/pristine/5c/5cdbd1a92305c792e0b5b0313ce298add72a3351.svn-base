@@ -1,0 +1,50 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.ucll.r0452425_tasks.domain.db;
+
+import com.ucll.r0452425_tasks.domain.model.Category;
+import com.ucll.r0452425_tasks.domain.model.Task;
+import com.ucll.r0452425_tasks.domain.model.TasksUser;
+import java.util.List;
+
+/**
+ *
+ * @author Tom
+ */
+public interface TasksDatabase {
+    
+    List<TasksUser> getUsers() throws DbException;
+    
+    TasksUser getUser(long id) throws DbException;
+    
+    void registerUser(TasksUser user) throws DbException;
+    
+    List<Task> getAllTasks(TasksUser user) throws DbException;
+    
+    List<Task> getTasks(long categoryId) throws DbException;
+    
+    Task getTask(long id) throws DbException;
+    
+    List<Category> getCategories(TasksUser user) throws DbException;
+    
+    Category getCategory(long id) throws DbException;
+    
+    long addTask(Task task) throws DbException;
+    
+    void removeTask(long id) throws DbException;
+    
+    long addCategory(Category category) throws DbException;
+    
+    void removeCategory(long id) throws DbException;
+    
+    void modifyTask(Task task) throws DbException;
+    
+    void markTaskAsDone(long id) throws DbException;
+    
+    void unmarkTaskAsDone(long id) throws DbException;
+    
+    
+}

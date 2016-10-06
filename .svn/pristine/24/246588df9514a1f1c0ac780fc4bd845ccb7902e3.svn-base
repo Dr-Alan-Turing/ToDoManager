@@ -1,0 +1,11 @@
+<script type="text/javascript" src="<c:url value="/resources/js/behaviour.js" />"></script>
+<article class="header">
+    <div id="weather">
+        <img src="<c:url value="/resources/images/weather${weather}.png" />" alt="weatherIcon">
+        <p><spring:message code="tasksHeader.weather1"/> <spring:message code="tasksHeader.weather${weather}"/> <spring:message code="tasksHeader.weather2"/></p>
+    </div>
+    <div id="titleAndLanguages">
+        <h1>Tasks</h1>
+        <p><a href="javascript:void(0);" onclick='insertParam("lang","en")'>en</a>|<a href="javascript:void(0);" onclick='insertParam("lang","nl")'>nl</a></p>
+    </div>
+</article>

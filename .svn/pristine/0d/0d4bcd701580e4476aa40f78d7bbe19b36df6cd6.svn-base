@@ -1,0 +1,261 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.ucll.r0452425_tasks.domain.db;
+
+import com.ucll.r0452425_tasks.domain.model.Category;
+import com.ucll.r0452425_tasks.domain.model.Task;
+import com.ucll.r0452425_tasks.domain.model.TasksUser;
+import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.Query;
+
+/**
+ *
+ * @author Tom
+ */
+public class TasksRelationalDatabase_JPA implements TasksDatabase {
+    
+    private EntityManagerFactory factory;
+    private EntityManager manager;
+    
+    public TasksRelationalDatabase_JPA(){
+        factory = Persistence.createEntityManagerFactory("TasksPU");
+        manager = factory.createEntityManager();
+    }
+    
+    private void closeConnection() throws DbException {
+//        try {
+//            manager.close();
+//            factory.close();
+//        } catch (Exception e){
+//            throw new DbException("Error: Connection to database failed to close");
+//        }
+    }
+    
+    @Override
+    public List<Task> getAllTasks(TasksUser user) throws DbException {
+        try {
+            Query query = manager.createQuery("select t from Task t where t.owner.id="+user.getId());
+            closeConnection();
+            return query.getResultList();
+        } catch (Exception e){
+            throw new DbException(e.getMessage());
+        } finally {
+            closeConnection();
+        }
+    }
+
+    @Override
+    public List<Task> getTasks(long categoryId) throws DbException {
+        try {
+            Query query = manager.createQuery("select t from Task t where t.category.id="+categoryId);
+            closeConnection();
+            return query.getResultList();
+        } catch (Exception e){
+            throw new DbException(e.getMessage());
+        } finally {
+            closeConnection();
+        }
+    }
+
+    @Override
+    public Task getTask(long id) throws DbException {
+        try {
+            Query query = manager.createQuery("select t from Task t where t.id="+id);
+            closeConnection();
+            return (Task)(query.getResultList().get(0));
+        } catch (Exception e){
+            throw new DbException(e.getMessage());
+        } finally {
+            closeConnection();
+        }
+    }
+
+    @Override
+    public List<Category> getCategories(TasksUser user) throws DbException {
+        try {
+            Query query = manager.createQuery("select c from Category c where c.owner.id="+user.getId());
+            closeConnection();
+            return query.getResultList();
+        } catch (Exception e){
+            throw new DbException(e.getMessage());
+        } finally {
+            closeConnection();
+        }
+    }
+    
+    @Override
+    public Category getCategory(long id) throws DbException {
+        try {
+            Query query = manager.createQuery("select c from Category c where c.id="+id);
+            closeConnection();
+            return (Category)(query.getResultList().get(0));
+        } catch (Exception e){
+            throw new DbException(e.getMessage());
+        } finally {
+            closeConnection();
+        }
+    }
+    
+    @Override
+    public long addTask(Task task) throws DbException {
+        try {
+            manager.getTransaction().begin();
+            manager.persist(task);
+            manager.flush();
+            manager.getTransaction().commit();
+            return task.getId();
+        } catch (Exception e){
+            manager.getTransaction().rollback();
+            throw new DbException(e.getMessage());
+        } finally {
+            closeConnection();
+        }
+    }
+
+    @Override
+    public void removeTask(long id) throws DbException {
+        try {
+            manager.getTransaction().begin();
+            Task task = manager.find(Task.class, id);
+            manager.remove(task);
+            manager.flush();
+            manager.getTransaction().commit();
+        } catch (Exception e){
+            manager.getTransaction().rollback();
+            throw new DbException(e.getMessage());
+        } finally {
+            closeConnection();
+        }
+    }
+
+    @Override
+    public long addCategory(Category category) throws DbException {
+        try {
+            manager.getTransaction().begin();
+            manager.persist(category);
+            manager.flush();
+            manager.getTransaction().commit();
+            return category.getId();
+        } catch (Exception e){
+            manager.getTransaction().rollback();
+            throw new DbException(e.getMessage());
+        } finally {
+            closeConnection();
+        }
+    }
+
+    @Override
+    public void removeCategory(long id) throws DbException {
+        try {
+            manager.getTransaction().begin();
+            Category category = manager.find(Category.class, id);
+            manager.remove(category);
+            manager.flush();
+            manager.getTransaction().commit();
+        } catch (Exception e){
+            manager.getTransaction().rollback();
+            throw new DbException(e.getMessage());
+        } finally {
+            closeConnection();
+        }
+    }
+
+    @Override
+    public void modifyTask(Task task) throws DbException {
+        try {
+            manager.getTransaction().begin();
+            Task t = manager.find(Task.class, task.getId());
+            t.setDescription(task.getDescription());
+            t.setCategory(task.getCategory());
+            t.setIsDone(task.getIsDone());
+            manager.flush();
+            manager.getTransaction().commit();
+        } catch (Exception e){
+            manager.getTransaction().rollback();
+            throw new DbException(e.getMessage());
+        } finally {
+            closeConnection();
+        }
+    }
+
+    @Override
+    public void markTaskAsDone(long id) throws DbException {
+        try {
+            manager.getTransaction().begin();
+            Task task = manager.find(Task.class, id);
+            task.markAsDone();
+            manager.flush();
+            manager.getTransaction().commit();
+        } catch (Exception e){
+            manager.getTransaction().rollback();
+            throw new DbException(e.getMessage());
+        } finally {
+            closeConnection();
+        }
+    }
+
+    @Override
+    public void unmarkTaskAsDone(long id) throws DbException {
+        try {
+            manager.getTransaction().begin();
+            Task task = manager.find(Task.class, id);
+            task.unmarkAsDone();
+            manager.flush();
+            manager.getTransaction().commit();
+        } catch (Exception e){
+            manager.getTransaction().rollback();
+            throw new DbException(e.getMessage());
+        } finally {
+            closeConnection();
+        }
+    }
+
+    @Override
+    public List<TasksUser> getUsers() throws DbException {
+        try {
+            Query query = manager.createQuery("select u from TasksUser u");
+            closeConnection();
+            return query.getResultList();
+        } catch (Exception e){
+            throw new DbException(e.getMessage());
+        } finally {
+            closeConnection();
+        }
+    }
+
+    @Override
+    public void registerUser(TasksUser user) throws DbException {
+        try {
+            manager.getTransaction().begin();
+            manager.persist(user);
+            manager.flush();
+            manager.getTransaction().commit();
+        } catch (Exception e){
+            manager.getTransaction().rollback();
+            throw new DbException(e.getMessage());
+        } finally {
+            closeConnection();
+        }
+    }
+
+    @Override
+    public TasksUser getUser(long id) throws DbException {
+        try {
+            Query query = manager.createQuery("select u from TasksUser u where u.id="+id);
+            closeConnection();
+            return (TasksUser)(query.getResultList().get(0));
+        } catch (Exception e){
+            throw new DbException(e.getMessage());
+        } finally {
+            closeConnection();
+        }
+    }
+    
+    
+}

@@ -1,0 +1,110 @@
+package JUnit;
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+import com.ucll.r0452425_tasks.domain.model.Category;
+import com.ucll.r0452425_tasks.domain.model.ModelException;
+import com.ucll.r0452425_tasks.domain.model.Task;
+import com.ucll.r0452425_tasks.domain.model.TasksUser;
+import static org.junit.Assert.assertEquals;
+import org.junit.Before;
+import org.junit.Test;
+
+/**
+ *
+ * @author Tom
+ */
+public class Test_UnitTestEntities {
+    
+    private TasksUser validUser, invalidUser;
+    private Category validCategory;
+    private String validEmail, validPassword, validName, validDescription, invalidEmail, invalidPassword, invalidName, invalidDescription;
+    
+    @Before
+    public void setUp() {
+        validUser = new TasksUser("test@test.com", "password");
+        invalidUser = null;
+        validCategory = new Category("name", validUser);
+        validEmail = "test@test.com";
+        validPassword = "password";
+        validName = "name";
+        validDescription = "description";
+        invalidEmail = "";
+        invalidPassword = "";
+        invalidName = "";
+        invalidDescription = "";
+    }
+    
+    //TasksUser
+    @Test
+    public void createUser_usingValidArguments_setsAttributes() throws ModelException {
+        TasksUser u = new TasksUser();
+        u.setEmail(validEmail);
+        u.setPassword(validPassword);
+        assertEquals(validEmail,u.getEmail());
+        assertEquals(validPassword,u.getPassword());
+    }
+    @Test(expected=ModelException.class)
+    public void createUser_usingInvalidEmail_throwsModelException() throws ModelException {
+        TasksUser u = new TasksUser();
+        u.setEmail(invalidEmail);
+    }
+    @Test(expected=ModelException.class)
+    public void createUser_usingInvalidPassword_throwsModelException() throws ModelException {
+        TasksUser u = new TasksUser();
+        u.setPassword(invalidPassword);
+    }
+    
+    //Category
+    @Test
+    public void createCategory_usingValidArguments_setsAttributes() throws ModelException {
+        Category c = new Category();
+        c.setName(validName);
+        c.setOwner(validUser);
+        assertEquals(validName,c.getName());
+        assertEquals(validUser,c.getOwner());
+    }
+    @Test(expected=ModelException.class)
+    public void createCategory_usingInvalidName_throwsModelException() throws ModelException {
+        Category c = new Category();
+        c.setName(invalidName);
+    }
+    @Test(expected=ModelException.class)
+    public void createCategory_usingInvalidUser_throwsModelException() throws ModelException {
+        Category c = new Category();
+        c.setOwner(invalidUser);
+    }
+    
+    //Task
+    @Test
+    public void createTask_usingValidArguments_setsAttributes() throws ModelException {
+        Task t = new Task();
+        t.setDescription(validDescription);
+        t.setCategory(validCategory);
+        t.setOwner(validUser);
+        assertEquals(validDescription,t.getDescription());
+        assertEquals(validCategory,t.getCategory());
+        assertEquals(validUser,t.getOwner());
+    }
+    @Test(expected=ModelException.class)
+    public void createTask_usingInvalidDescription_throwsModelException() throws ModelException {
+        Task t = new Task();
+        t.setDescription(invalidDescription);
+    }
+    @Test
+    public void createTask_usingEmptyCategory_setsEmptyAttribute() throws ModelException {
+        Task t = new Task();
+        t.setCategory(null);
+        assertEquals(null,t.getCategory());
+    }
+    @Test(expected=ModelException.class)
+    public void createTask_usingInvalidOwner_throwsModelException() throws ModelException {
+        Task t = new Task();
+        t.setOwner(invalidUser);
+    }
+    
+}

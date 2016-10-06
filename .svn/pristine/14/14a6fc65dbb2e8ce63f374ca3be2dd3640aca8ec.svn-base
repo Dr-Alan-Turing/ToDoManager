@@ -1,0 +1,150 @@
+package JUnit;
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+import com.ucll.r0452425_tasks.domain.model.Category;
+import com.ucll.r0452425_tasks.domain.model.Task;
+import com.ucll.r0452425_tasks.domain.model.TasksUser;
+import com.ucll.r0452425_tasks.domain.service.NotLoggedInException;
+import com.ucll.r0452425_tasks.domain.service.ServiceException;
+import com.ucll.r0452425_tasks.domain.service.TasksService;
+import com.ucll.r0452425_tasks.domain.service.UnauthorisedActionException;
+import java.util.ArrayList;
+import java.util.List;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import org.junit.Before;
+import org.junit.Test;
+
+/**
+ *
+ * @author Tom
+ */
+public class Test_UnitTestFacade {
+    
+    private TasksService service;
+    private String validEmail, validPassword, invalidPassword;
+    private TasksUser user, validUser, invalidUser;
+    private Category category;
+    private Task task, validTask;
+    private long validUserId, invalidUserId, validTaskId, invalidTaskId, validCategoryId, invalidCategoryId;
+    
+    @Before
+    public void setUp() throws ServiceException, NotLoggedInException {
+        service = new TasksService("memory");
+        validEmail = "test@test.com";
+        validPassword = "password";
+        invalidPassword = "other";
+        user = new TasksUser(validEmail, validPassword);
+        validUser = new TasksUser("user@tasks.com", "password");
+        invalidUser = null;
+        category = new Category("name", user);
+        task = new Task("Test 1", category, user, false);
+        service.registerUser(user);
+        validUserId = user.getId();
+        service.addCategory(user, category);
+        validCategoryId = category.getId();
+        service.addTask(user, task);
+        validTaskId = task.getId();
+        invalidUserId = 9999;
+        invalidTaskId = 9999;
+        invalidCategoryId = 9999;
+        validTask = new Task("Test 2", category, user, false);
+    }
+    
+    @Test
+    public void registerUser_usingValidUser_addsUser() throws ServiceException{
+        service.registerUser(validUser);
+        assertTrue(service.getUsers().contains(validUser));
+    }
+    @Test(expected=ServiceException.class)
+    public void registerUser_usingInvalidUser_throwsServiceException() throws ServiceException{
+        service.registerUser(invalidUser);
+    }
+    @Test
+    public void getAuthenticatedUser_usingValidCredentials_returnsUser() throws ServiceException{
+        assertEquals(user,service.getAuthenticatedUser(validEmail, validPassword));
+    }
+    @Test
+    public void getAuthenticatedUser_usingInvalidCredentials_returnsNull() throws ServiceException{
+        assertEquals(null,service.getAuthenticatedUser(validEmail, invalidPassword));
+    }
+    @Test
+    public void getUsers_returnsUserList() throws ServiceException{
+        List<TasksUser> users = service.getUsers();
+        assertFalse(users.isEmpty());
+        assertTrue(users.contains(user));
+    }
+    @Test
+    public void getUserById_usingValidId_returnsUser(){
+        assertEquals(user,service.getUserById(validUserId));
+    }
+    @Test
+    public void getUserById_usingInvalidId_returnsNull(){
+        assertEquals(null,service.getUserById(invalidUserId));
+    }
+    @Test
+    public void getAllTasks_usingValidUser_returnsTasks() throws ServiceException, NotLoggedInException{
+        assertTrue(service.getAllTasks(user) instanceof List);
+        assertFalse(service.getAllTasks(user).isEmpty());
+        assertTrue(service.getAllTasks(user).contains(task));
+    }
+    @Test
+    public void getTaskById_usingValidId_returnsTask(){
+        assertEquals(task,service.getTaskById(validTaskId));
+    }
+    @Test
+    public void getTaskById_usingInvalidId_returnsNull(){
+        assertEquals(null,service.getTaskById(invalidTaskId));
+    }
+    @Test
+    public void addTask_usingValidArguments_addsTask() throws ServiceException, NotLoggedInException{
+        service.addTask(user, validTask);
+        assertTrue(service.getAllTasks(user).contains(validTask));
+    }
+    @Test
+    public void removeTask_usingValidId_removesTask() throws ServiceException, NotLoggedInException, UnauthorisedActionException{
+        service.removeTask(user, validTaskId);
+        assertFalse(service.getAllTasks(user).contains(task));
+    }
+    @Test
+    public void markTaskAsDone_usingValidId_marksTaskAsDone() throws ServiceException, NotLoggedInException, UnauthorisedActionException{
+        service.markTaskAsDone(user, validTaskId);
+        assertTrue(task.getIsDone());
+    }
+    @Test
+    public void getCategories_usingValidUser_returnsCategories() throws ServiceException, NotLoggedInException{
+        assertTrue(service.getCategories(user) instanceof List);
+        assertFalse(service.getCategories(user).isEmpty());
+        assertTrue(service.getCategories(user).contains(category));
+    }
+    @Test
+    public void getCategoryById_usingValidId_returnsCategory(){
+        assertEquals(category,service.getCategoryById(validCategoryId));
+    }
+    @Test
+    public void getCategoryById_usingInvalidId_returnsNull(){
+        assertEquals(null,service.getCategoryById(invalidCategoryId));
+    }
+    @Test(expected=NotLoggedInException.class)
+    public void validateUser_usingInvalidUser_NotLoggedInException() throws NotLoggedInException{
+        service.validateUser(null);
+    }
+    @Test(expected=UnauthorisedActionException.class)
+    public void validateTaskAction_usingWrongUser_throwsUnauthorisedActionException() throws NotLoggedInException, UnauthorisedActionException, ServiceException{
+        service.registerUser(validUser);
+        service.validateTaskAction(validUser, validTaskId);
+    }
+    @Test(expected=UnauthorisedActionException.class)
+    public void validateCategoryAction_usingWrongUser_throwsUnauthorisedActionException() throws NotLoggedInException, UnauthorisedActionException, ServiceException{
+        service.registerUser(validUser);
+        service.validateCategoryAction(validUser, validCategoryId);
+    }
+    
+    
+}

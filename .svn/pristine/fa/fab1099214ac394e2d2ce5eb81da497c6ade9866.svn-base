@@ -1,0 +1,72 @@
+#errors
+
+tasksLogin.credentialsNotFound=*Email and password combination not found. Please try again.
+tasksRegister.emailAlreadyRegistered=*Email address already registered. Please log in or use another one.
+tasksCreateTask.taskExists=*Task with same description already exists.
+tasksModifyTask.taskExists=*Other task with same description already exists.
+tasksOverview.invalidNewCategory=Category name can not be empty. Please try again.
+tasksOverview.categoryExists=Category with same name already exists. Please choose another.
+tasksOverview.deletingAll='All' is not a category and can therefore not be deleted.
+
+#other
+
+tasksOverview.confirmDeleteCategory=Deleting a category will also delete its tasks. Continue?
+tasksLogin.registerSuccess=Successfully registered! Please log in below.
+
+#titles
+
+tasksLogin.title=Log-in to Tasks
+tasksRegister.title=Register to Tasks
+tasksOverview.title=My tasks
+tasksCreateTask.title=Create new task
+tasksModifyTask.title=Modify task
+
+#header
+
+tasksHeader.weather1=What will you do on this
+tasksHeader.weatherFreezing=freezing
+tasksHeader.weatherVeryCold=very cold
+tasksHeader.weatherCold=cold
+tasksHeader.weatherDecent=decent
+tasksHeader.weatherWarm=warm
+tasksHeader.weatherVeryWarm=very warm
+tasksHeader.weatherHot=hot
+tasksHeader.weatherVeryHot=very hot
+tasksHeader.weather2=day?
+
+#page items
+
+tasksLoginOrRegister.emailLabel=Email address:
+tasksLoginOrRegister.emailPlaceholder=user@example.com
+tasksLoginOrRegister.passwordLabel=Password:
+
+tasksLogin.h2=Welcome to Tasks!
+tasksLogin.noAccountText=Don't have an account?
+tasksLogin.noAccountLink=Register for free!
+tasksLogin.submit=Log-in to Tasks
+
+tasksRegister.backToLogin=Back to log-in page
+tasksRegister.h2=Get organised with Tasks
+tasksRegister.submit=Sign me up!
+
+tasksOverview.categories=Categories
+tasksOverview.categoriesAll=All
+tasksOverview.categoriesDelete=Delete category
+tasksOverview.categoriesAdd=Add category...
+tasksOverview.tasksCreateNew=Create new task...
+tasksOverview.toDo=To-Do
+tasksOverview.done=Done
+tasksOverview.logout=Log-out of Tasks
+
+tasksCreateOrModifyTask.descriptionLabel=Description:
+tasksCreateOrModifyTask.descriptionPlaceholder=I have to...
+tasksCreateOrModifyTask.categoryLabel=Category:
+tasksCreateOrModifyTask.categoryDefaultOption=- select -
+tasksCreateOrModifyTask.doneLabel=Done?
+tasksCreateOrModifyTask.backToTasks=Back to tasks...
+
+tasksCreateTask.h2=Create new task...
+tasksCreateTask.submit=Add to tasks
+
+tasksModifyTask.h2=Modify task...
+tasksModifyTask.submit=Save changes
